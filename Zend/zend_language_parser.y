@@ -188,6 +188,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_EMPTY      "empty (T_EMPTY)"
 %token T_HALT_COMPILER "__halt_compiler (T_HALT_COMPILER)"
 %token T_CLASS      "class (T_CLASS)"
+%token T_RECORD     "record (T_RECORD)"
 %token T_TRAIT      "trait (T_TRAIT)"
 %token T_INTERFACE  "interface (T_INTERFACE)"
 %token T_EXTENDS    "extends (T_EXTENDS)"
@@ -228,7 +229,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_ERROR
 
 %type <ast> top_statement namespace_name name statement function_declaration_statement
-%type <ast> class_declaration_statement trait_declaration_statement
+%type <ast> class_declaration_statement trait_declaration_statement record_declaration_statement
 %type <ast> interface_declaration_statement interface_extends_list
 %type <ast> group_use_declaration inline_use_declarations inline_use_declaration
 %type <ast> mixed_group_use_declaration use_declaration unprefixed_use_declaration
@@ -314,6 +315,7 @@ top_statement:
 		statement							{ $$ = $1; }
 	|	function_declaration_statement		{ $$ = $1; }
 	|	class_declaration_statement			{ $$ = $1; }
+	|	record_declaration_statement			{ $$ = $1; }
 	|	trait_declaration_statement			{ $$ = $1; }
 	|	interface_declaration_statement		{ $$ = $1; }
 	|	T_HALT_COMPILER '(' ')' ';'
@@ -415,6 +417,7 @@ inner_statement:
 		statement { $$ = $1; }
 	|	function_declaration_statement 		{ $$ = $1; }
 	|	class_declaration_statement 		{ $$ = $1; }
+	|	record_declaration_statement 		{ $$ = $1; }
 	|	trait_declaration_statement			{ $$ = $1; }
 	|	interface_declaration_statement		{ $$ = $1; }
 	|	T_HALT_COMPILER '(' ')' ';'
@@ -509,6 +512,15 @@ class_declaration_statement:
 		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
 			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, $1, $<num>3, $7, zend_ast_get_str($4), $5, $6, $9, NULL); }
 	|	T_CLASS { $<num>$ = CG(zend_lineno); }
+		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, 0, $<num>2, $6, zend_ast_get_str($3), $4, $5, $8, NULL); }
+;
+
+record_declaration_statement:
+		class_modifiers T_RECORD { $<num>$ = CG(zend_lineno); }
+		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, $1, $<num>3, $7, zend_ast_get_str($4), $5, $6, $9, NULL); }
+	|	T_RECORD { $<num>$ = CG(zend_lineno); }
 		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
 			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, 0, $<num>2, $6, zend_ast_get_str($3), $4, $5, $8, NULL); }
 ;

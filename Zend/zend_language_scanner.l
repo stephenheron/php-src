@@ -1418,6 +1418,10 @@ NEWLINE ("\r"|"\n"|"\r\n")
 	RETURN_TOKEN(T_CLASS);
 }
 
+<ST_IN_SCRIPTING>"record" {
+	RETURN_TOKEN(T_RECORD);
+}
+
 <ST_IN_SCRIPTING>"interface" {
 	RETURN_TOKEN(T_INTERFACE);
 }
